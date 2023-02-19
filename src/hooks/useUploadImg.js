@@ -19,13 +19,13 @@ export default function useUploadImg() {
     };
     const UploadImgComp = () => (
         <View style={Styles.container}>
-            <Button title="Upload an image" onPress={uploadImage} />
             {uploadImg &&
                 <Image
                     source={{ uri: uploadImg.uri }}
                     style={Styles.uploadImgPreview}
                 />
             }
+            <Button title={uploadImg ? 'Replace this image' : 'Upload an image'} onPress={uploadImage} />
         </View>
     );
     return ({ uploadImg, UploadImgComp });
