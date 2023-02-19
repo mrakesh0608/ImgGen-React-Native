@@ -12,7 +12,7 @@ const useFetch = () => {
 
     const fetchData = async ({ path, options }) => {
 
-        console.log(path, options);
+        // console.log(path, options);
         setIsFetching(true);
         setData(null);
         setError(null);
@@ -22,7 +22,7 @@ const useFetch = () => {
             const json = await res.json();
 
             // console.log(res);
-            console.log(json);
+            // console.log(json);
 
             if (json.data) {
                 setData(json.data);

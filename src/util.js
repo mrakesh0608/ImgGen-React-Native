@@ -43,9 +43,9 @@ export async function uploadImage() {
 
     // No permissions request is necessary for launching the image library
     const result = await ImagePicker[type]({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
-        // aspect: [4, 3],
+        aspect: [1, 1],
         quality: 1,
     });
 

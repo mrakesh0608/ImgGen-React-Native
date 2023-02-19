@@ -50,7 +50,7 @@ export default function ImgVar({ route }) {
                 data={data}
                 renderItem={({ item }) => <ImageWithOpenUrl url={item.url} />}
 
-                ListEmptyComponent={!error && firstTimeFetched && !data &&
+                ListEmptyComponent={isFetching && !error && firstTimeFetched && !data &&
                     <View>
                         <Text style={{ marginTop: 40, fontSize: 20 }}> Empty</Text >
                     </View>
