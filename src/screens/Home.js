@@ -1,4 +1,4 @@
-import { View, Button, FlatList, StyleSheet, TouchableOpacity, Text } from "react-native";
+import { View, FlatList, StyleSheet, TouchableOpacity, Text } from "react-native";
 
 export default function Home({ navigation }) {
 
@@ -14,11 +14,12 @@ export default function Home({ navigation }) {
                 data={list}
                 renderItem={({ item }) =>
                     <View style={styles.btnContainer}>
-                        <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate(item.navigation,item)}>
+                        <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate(item.navigation, item)}>
                             <Text style={styles.btnText}>{item.title}</Text>
                         </TouchableOpacity>
                     </View>
                 }
+                contentContainerStyle={styles.flatList}
             />
         </View>
     );
@@ -27,12 +28,17 @@ export default function Home({ navigation }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
-        paddingTop: 40,
+    },
+    flatList: {
+        // flex: 1, NEVER SET FLEX PROPERTY TO FLATLIST 
+        alignItems: 'center',
     },
     btnContainer: {
+        width: 200,
         margin: 20,
+        padding: 10,
     },
     btn: {
         backgroundColor: "#1e90ff",
@@ -44,6 +50,5 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
         textAlign: 'center',
-        width:150,
     }
 })

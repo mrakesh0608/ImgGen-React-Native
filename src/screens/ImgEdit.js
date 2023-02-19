@@ -1,113 +1,79 @@
-import { useState } from 'react';
-import { Button, Image, View, Text, TextInput, Alert } from 'react-native';
+import { FlatList, Text, View, StyleSheet } from 'react-native';
+
+import useFetch from '../hooks/useFetch';
+
 import ScreenDesc from '../components/ScreenDesc';
+import FormImgEdit from '../components/forms/FormImgEdit';
+import ImageWithOpenUrl from '../components/ImageWithOpenUrl';
 
-import gStyles from '../styles/globalStyles';
-
-import util from '../util';
+import * as util from '../util';
 
 export default function ImgEdit({ route }) {
 
     const { title } = route.params;
+    const { fetchData, isFetching, data, error, firstTimeFetched } = useFetch();
 
-    const [inputEle, setInputEle] = useState(null);
-    const [searchText, setSearchText] = useState(null);
-
-    const [searchOn, setSearchOn] = useState(false);
-
-    const [image, setImage] = useState(null);
-    const [resImg, setResImg] = useState(null);
-    const [error, setError] = useState(null);
-
-    async function pickImage() {
-        const res = await util.pickImage();
-        if (!res.canceled) setImage(res.assets[0]);
-        else {
-            setImage(null);
-            setResImg(null);
-            setError(null);
-            Alert.alert('Alert', 'Picking Image cancelled')
-        }
-    };
-
-    async function getImg() {
-        inputEle.blur();
-        console.log('gen', searchText, image);
-
-        if (!searchText || !image) return;
-
-        setSearchOn(true);
+    async function generateImg({ prompt, img, numImg }) {
 
         const id = "id" + Math.random().toString(16).slice(2);
         let formData = new FormData();
         formData.append("Img", {
             name: `openai_${id}.jpg`,
-            uri: image.uri,
+            uri: img.uri,
             type: 'image/jpg',
         });
 
-        try {
-            const res = await fetch(`${util.serverAPI}/imgEdit?prompt=${searchText}`, {
+        fetchData({
+            path: `${util.serverAPI}/imgVariation??prompt=${prompt}&numImg=${numImg}`,
+            options: {
                 method: 'POST',
                 body: formData,
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'multipart/form-data',
                 }
-            })
-            const json = await res.json();
-            // console.log(res);
-            console.log(json);
-
-            if (json.data) {
-                setResImg(json.data);
-                setError(null);
             }
-            else throw Error(json.error.message);
-        }
-        catch (err) {
-            setError(err.message);
-            setResImg(null);
-        }
-
-        setSearchOn(false);
+        })
     }
 
     return (
-        <>
-            <ScreenDesc text={title} />
-            <View style={gStyles.container}>
-                <View style={gStyles.btnContainer}>
-                    <Button title="Pick an image" onPress={pickImage} />
-                </View>
-                {image &&
-                    <Image source={{ uri: image.uri }}
-                        style={{ width: 100, height: 100 }}
-                    />
+        <View style={{ flex: 1 }}>
+            <FlatList
+                ListHeaderComponent={
+                    <>
+                        <ScreenDesc text={title} bgColor='#ddd' />
+                        <Text style={styles.errorText}>This feature is currently under development, so you can't use for now.</Text>
+                        <FormImgEdit generating={isFetching} error={error} onSubmit={generateImg} disable={true}/>
+                    </>
                 }
 
-                <TextInput
-                    ref={inputEle => { setInputEle(inputEle) }}
-                    style={gStyles.input}
-                    onChangeText={val => setSearchText(val)}
-                    placeholder='Enter text to generate img'
-                />
+                keyExtractor={(item, index) => index}
+                data={data}
+                renderItem={({ item }) => <ImageWithOpenUrl url={item.url} />}
 
-                <Button title={searchOn ? 'Generating ...' : 'Generate'} onPress={getImg} disabled={true} />
-                <Text style={gStyles.error}>This feature is not implemented properly, so you can't use for now.</Text>
-                {!searchOn && resImg && (img.length === 0 ?
+                ListEmptyComponent={!error && firstTimeFetched && !data &&
+                    <View>
+                        <Text style={{ marginTop: 40, fontSize: 20 }}> Empty</Text >
+                    </View>
+                }
 
-                    <Text style={{ marginTop: 40, fontSize: 20 }}>Empty</Text> :
-                    <FlatList
-                        keyExtractor={(item, index) => index}
-                        data={resImg}
-                        renderItem={({ item }) => {
-                            console.log(item);
-                            return <Image source={{ uri: item.url }} style={gStyles.img} />
-                        }}
-                    />
-                )}
-            </View>
-        </>
+                contentContainerStyle={styles.container}
+            />
+            
+        </View>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flexGrow: 1,
+        justifyContent: 'center',
+        padding: 20,
+    },
+    errorText: {
+        color: 'crimson',
+        fontWeight: 'bold',
+        marginBottom: 10,
+        textAlign: 'center',
+    }
+})

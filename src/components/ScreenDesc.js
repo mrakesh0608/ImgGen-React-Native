@@ -1,8 +1,8 @@
 import { StyleSheet, Text } from "react-native";
 
-export default function ScreenDesc({ text }) {
+export default function ScreenDesc({ text ,bgColor}) {
     return (
-        <Text style={styles.textDesc}>{text}</Text>
+        <Text style={[styles.textDesc,{backgroundColor:bgColor}]}>{text}</Text>
     );
 }
 const styles = StyleSheet.create({
